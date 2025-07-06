@@ -13,6 +13,9 @@ interface User {
   id: string;
   email: string;
   name: string;
+  username: string;
+  role: 'admin' | 'user';
+  createdAt: string; // or Date if you prefer
 }
 
 interface AuthContextType {

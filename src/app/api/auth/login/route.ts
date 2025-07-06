@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
-import { loginSchema } from '@/lib/validations/auth'; 
+import { loginSchema } from '@/lib/validations/auth';
 import { generateToken } from '@/lib/auth';
 import User from '@/lib/models/User';
 import connectDB from '@/lib/db';
@@ -33,8 +33,11 @@ export async function POST(request: NextRequest) {
           id: user._id.toString(),
           name: user.name,
           email: user.email,
-          role: user.role,
+          username: user.username,       // ✅ Added
+          role: user.role,               // ✅ Already present
+          createdAt: user.createdAt,     // ✅ Added
         },
+        token,
       },
       { status: 200 }
     );
