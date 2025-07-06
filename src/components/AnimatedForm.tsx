@@ -1,3 +1,4 @@
+// src/components/AnimatedForm.tsx
 'use client';
 
 import { ReactNode, useState } from 'react';
@@ -7,9 +8,19 @@ interface AnimatedFormProps {
   children: ReactNode;
   onSubmit: (e: React.FormEvent) => void;
   className?: string;
+  submitText?: string;
+  isLoading?: boolean;
+  error?: string;
 }
 
-export const AnimatedForm = ({ children, onSubmit, className = '' }: AnimatedFormProps) => {
+export const AnimatedForm = ({ 
+  children, 
+  onSubmit, 
+  className = '', 
+  submitText = 'Submit', 
+  isLoading = false, 
+  error 
+}: AnimatedFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -22,6 +33,8 @@ export const AnimatedForm = ({ children, onSubmit, className = '' }: AnimatedFor
     }
   };
 
+  const showLoading = isLoading || isSubmitting;
+
   return (
     <motion.form
       onSubmit={handleSubmit}
@@ -30,16 +43,32 @@ export const AnimatedForm = ({ children, onSubmit, className = '' }: AnimatedFor
       transition={{ duration: 0.5 }}
       className={`space-y-6 ${className}`}
     >
-      {children}
-      {isSubmitting && (
+      {error && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex justify-center"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
         >
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          {error}
         </motion.div>
       )}
+      
+      {children}
+      
+      <AnimatedButton 
+        type="submit" 
+        disabled={showLoading}
+        className={showLoading ? 'opacity-50 cursor-not-allowed' : ''}
+      >
+        {showLoading ? (
+          <div className="flex items-center justify-center space-x-2">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            <span>Loading...</span>
+          </div>
+        ) : (
+          submitText
+        )}
+      </AnimatedButton>
     </motion.form>
   );
 };
