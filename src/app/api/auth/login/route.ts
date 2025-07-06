@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
-import { loginSchema } from '@/lib/validations/auth'; // ✅ This now works
+import { loginSchema } from '@/lib/validations/auth'; 
 import { generateToken } from '@/lib/auth';
 import User from '@/lib/models/User';
 import connectDB from '@/lib/db';

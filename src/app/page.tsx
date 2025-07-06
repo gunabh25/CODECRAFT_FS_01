@@ -251,8 +251,8 @@ export default function HomePage() {
                       <div className={`p-3 rounded-full bg-gray-800/50 ${feature.color}`}>
                         <feature.icon size={32} />
                       </div>
-                      <h4 className="text-xl font-semibold text-white">{feature.title}</h4>
-                      <p className="text-gray-400 text-sm leading-relaxed">{feature.description}</p>
+                      <h4 className="text-xl font-semibold text-black">{feature.title}</h4>
+                      <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
                     </div>
                   </Card>
                 </motion.div>

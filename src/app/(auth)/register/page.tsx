@@ -6,13 +6,13 @@ import AnimatedForm from '@/components/AnimatedForm';
 import { User, Mail, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import ModalWrapper from 'src/components/ModalWrapper'; // ✅ modal component
+import ModalWrapper from 'src/components/ModalWrapper';
 
 export default function RegisterPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(true); // ✅ modal state
-  const [success, setSuccess] = useState(false); // ✅ success animation
+  const [isOpen, setIsOpen] = useState(true);
+  const [success, setSuccess] = useState(false);
   const { register } = useAuth();
 
   const fields = [
@@ -63,8 +63,8 @@ export default function RegisterPage() {
     }
 
     try {
-      await register(data.username, data.email, data.password);
-      setSuccess(true); // ✅ trigger success animation
+      await register(data.username, data.email, data.password, data.confirmPassword);
+      setSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
@@ -72,7 +72,6 @@ export default function RegisterPage() {
     }
   };
 
-  // ✅ Show nothing if modal is closed
   if (!isOpen) return null;
 
   return (
@@ -95,10 +94,7 @@ export default function RegisterPage() {
           <h2 className="text-xl font-semibold text-green-600">
             Account created successfully!
           </h2>
-          <Link
-            href="/login"
-            className="text-blue-500 underline text-sm hover:text-blue-400"
-          >
+          <Link href="/login" className="text-blue-500 underline text-sm hover:text-blue-400">
             Go to Login
           </Link>
         </motion.div>
@@ -123,10 +119,7 @@ export default function RegisterPage() {
                 Terms of Service
               </Link>{' '}
               and{' '}
-              <Link
-                href="/privacy"
-                className="text-blue-400 hover:text-blue-300"
-              >
+              <Link href="/privacy" className="text-blue-400 hover:text-blue-300">
                 Privacy Policy
               </Link>
             </div>
