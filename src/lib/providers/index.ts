@@ -1,9 +1,19 @@
+// src/lib/providers/index.ts
 'use client';
 
+import { ReactNode } from 'react';
 import { AuthProvider } from '@/lib/contexts/AuthContext';
 
-export function Providers({ children }: { children: React.ReactNode }) {
-  return <AuthProvider>{children}</AuthProvider>;
+interface ProvidersProps {
+  children: ReactNode;
 }
+
+export const Providers = ({ children }: ProvidersProps) => {
+  return (
+    <AuthProvider>
+      {children}
+    </AuthProvider>
+  );
+};
 
 export default Providers;

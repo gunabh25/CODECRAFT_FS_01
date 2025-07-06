@@ -1,3 +1,4 @@
+// src/lib/contexts/AuthContext.tsx
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -16,7 +17,7 @@ interface AuthContextType {
   loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -39,12 +40,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const checkAuth = async () => {
       try {
         // Add your authentication check logic here
-        const token = localStorage.getItem('authToken');
-        if (token) {
-          // Verify token and get user data
-          // This is a placeholder - implement your actual auth logic
-          const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-          setUser(userData);
+        if (typeof window !== 'undefined') {
+          const token = localStorage.getItem('authToken');
+          if (token) {
+            // Verify token and get user data
+            // This is a placeholder - implement your actual auth logic
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+              setUser(JSON.parse(userData));
+            }
+          }
         }
       } catch (error) {
         console.error('Auth check failed:', error);
@@ -72,8 +77,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('userData', JSON.stringify(data.user));
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('userData', JSON.stringify(data.user));
+        }
       } else {
         throw new Error('Login failed');
       }
@@ -101,8 +108,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('userData', JSON.stringify(data.user));
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('userData', JSON.stringify(data.user));
+        }
       } else {
         throw new Error('Registration failed');
       }
@@ -116,8 +125,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userData');
+    }
   };
 
   const value = {
