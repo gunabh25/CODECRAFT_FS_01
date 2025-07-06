@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { ClientProviders } from './ClientProviders'; // 👈 new file
+import { ClientProviders } from './ClientProviders'; 
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -10,9 +10,16 @@ export const metadata: Metadata = {
   description: 'A modern, secure authentication system with advanced UI/UX',
   keywords: ['authentication', 'nextjs', 'framer-motion', 'security'],
   authors: [{ name: 'SecureAuth Team' }],
-  viewport: 'width=device-width, initial-scale=1',
-  themeColor: '#000000',
 };
+
+// ✅ Move viewport out of metadata
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
+
+// ✅ Move themeColor out of metadata
+export const themeColor = '#000000';
 
 export default function RootLayout({
   children,
