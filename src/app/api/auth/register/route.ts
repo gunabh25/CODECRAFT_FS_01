@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { registerSchema } from '../../../lib/validations/auth';
-import { generateToken } from '../../../lib/auth';
-import User from '../../../lib/models/User';
-import connectDB from '../../../lib/db';
+import { registerSchema } from 'src/lib/validations/auth';
+import { generateToken } from 'src/lib/auth';
+import User from 'src/lib/models/User';
+import connectDB from 'src/lib/db';
 
 export async function POST(request: NextRequest) {
   try {

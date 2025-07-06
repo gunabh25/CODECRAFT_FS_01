@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/lib/contexts/AuthContext';
 import { AuthGuard } from '@/components/AuthGuard';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/Card';

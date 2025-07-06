@@ -15,7 +15,7 @@ interface AnimatedFormProps {
   title?: string;
   fields?: Field[];
   className?: string;
-  onSubmit?: (data: Record<string, string>) => void;
+  onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void | Promise<void>;
   submitText?: string;
   isLoading?: boolean;
   error?: string;
@@ -46,10 +46,10 @@ const AnimatedForm: React.FC<AnimatedFormProps> = ({
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (onSubmit) {
-      onSubmit(formData);
+      onSubmit(e);
     }
   };
 

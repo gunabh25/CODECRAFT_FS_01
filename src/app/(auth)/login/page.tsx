@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/lib/contexts/AuthContext';
 import AnimatedForm from '@/components/AnimatedForm'; 
 import { Mail, Lock } from 'lucide-react';
 import Link from 'next/link';
