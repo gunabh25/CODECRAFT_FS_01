@@ -7,12 +7,18 @@ interface AnimatedFormProps {
   children: React.ReactNode;
   className?: string;
   onSubmit?: (e: React.FormEvent) => void;
+  submitText?: string;
+  isLoading?: boolean;
+  error?: string;
 }
 
 const AnimatedForm: React.FC<AnimatedFormProps> = ({
   children,
   className = '',
   onSubmit,
+  submitText = 'Submit',
+  isLoading = false,
+  error = '',
 }) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -32,6 +38,20 @@ const AnimatedForm: React.FC<AnimatedFormProps> = ({
           onSubmit={onSubmit}
         >
           {children}
+
+          {/* Error message */}
+          {error && (
+            <p className="text-red-500 text-sm text-center">{error}</p>
+          )}
+
+          {/* Submit button */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-all disabled:opacity-50"
+          >
+            {isLoading ? 'Loading...' : submitText}
+          </button>
         </motion.form>
       )}
     </AnimatePresence>
