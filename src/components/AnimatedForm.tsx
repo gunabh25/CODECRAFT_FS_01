@@ -56,14 +56,14 @@ const AnimatedForm: React.FC<AnimatedFormProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`w-full max-w-md bg-white p-6 rounded-lg shadow-lg space-y-6 ${className}`}
+      className={`w-full max-w-md bg-zinc-900 p-8 rounded-2xl shadow-2xl space-y-6 text-white ${className}`}
     >
       {title && (
         <motion.h2
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="text-xl font-semibold text-center"
+          className="text-2xl font-bold text-center"
         >
           {title}
         </motion.h2>
@@ -73,7 +73,7 @@ const AnimatedForm: React.FC<AnimatedFormProps> = ({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm"
+          className="bg-red-500/20 border border-red-500 text-red-300 px-4 py-3 rounded-lg text-sm"
         >
           {error}
         </motion.div>
@@ -143,8 +143,8 @@ export const AnimatedInput: React.FC<AnimatedInputProps> = ({
         required={required}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        className={`w-full px-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
-          isFocused ? 'border-blue-500 shadow-md' : 'border-gray-300'
+        className={`w-full bg-zinc-800 text-white placeholder-gray-400 px-10 py-3 border border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
+          isFocused ? 'border-blue-500 shadow-md' : 'border-zinc-700'
         } ${className}`}
       />
       {isFocused && (
@@ -180,10 +180,10 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
       disabled={disabled}
       whileHover={{ scale: disabled ? 1 : 1.05 }}
       whileTap={{ scale: disabled ? 1 : 0.95 }}
-      className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+      className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-200 ${
         disabled
-          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          : 'bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700'
+          ? 'bg-zinc-700 text-zinc-400 cursor-not-allowed'
+          : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
       } ${className}`}
     >
       {children}
