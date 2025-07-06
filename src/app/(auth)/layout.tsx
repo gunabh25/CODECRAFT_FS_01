@@ -1,13 +1,23 @@
-// app/layout.tsx or app/(auth)/layout.tsx
+'use client';
 
-import { AuthProvider } from '@/lib/contexts/AuthContext';
+import { usePathname } from 'next/navigation';
+import { AnimatePresence, motion } from 'framer-motion';
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
+  const path = usePathname();
+
   return (
-    <html lang="en">
-      <body>
-        <AuthProvider>{children}</AuthProvider>
-      </body>
-    </html>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={path}
+        initial={{ opacity: 0, x: 40 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -40 }}
+        transition={{ duration: 0.3 }}
+        className="min-h-screen flex items-center justify-center p-6"
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
   );
 }
