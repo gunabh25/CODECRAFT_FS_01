@@ -3,28 +3,55 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+interface Field {
+  name: string;
+  type: string;
+  placeholder: string;
+  icon?: React.ReactNode;
+  required?: boolean;
+}
+
 interface AnimatedFormProps {
-  children: React.ReactNode;
+  title?: string;
+  fields?: Field[];
   className?: string;
-  onSubmit?: (e: React.FormEvent) => void;
+  onSubmit?: (data: Record<string, string>) => void;
   submitText?: string;
   isLoading?: boolean;
   error?: string;
+  children?: React.ReactNode;
 }
 
 const AnimatedForm: React.FC<AnimatedFormProps> = ({
-  children,
+  title,
+  fields = [],
   className = '',
   onSubmit,
   submitText = 'Submit',
   isLoading = false,
   error = '',
+  children
 }) => {
+  const [formData, setFormData] = useState<Record<string, string>>({});
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (onSubmit) {
+      onSubmit(formData);
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -34,17 +61,33 @@ const AnimatedForm: React.FC<AnimatedFormProps> = ({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
-          className={`space-y-6 ${className}`}
-          onSubmit={onSubmit}
+          className={`space-y-6 max-w-md mx-auto p-6 bg-white shadow-md rounded-md ${className}`}
+          onSubmit={handleSubmit}
         >
-          {children}
-
-          {/* Error message */}
-          {error && (
-            <p className="text-red-500 text-sm text-center">{error}</p>
+          {title && (
+            <h2 className="text-2xl font-bold text-center text-gray-700">
+              {title}
+            </h2>
           )}
 
-          {/* Submit button */}
+          {fields.map((field) => (
+            <div key={field.name} className="flex items-center border rounded px-3 py-2 space-x-2">
+              {field.icon}
+              <input
+                type={field.type}
+                name={field.name}
+                placeholder={field.placeholder}
+                required={field.required}
+                onChange={handleChange}
+                className="w-full outline-none"
+              />
+            </div>
+          ))}
+
+          {children}
+
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
           <button
             type="submit"
             disabled={isLoading}
