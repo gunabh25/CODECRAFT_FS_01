@@ -1,30 +1,26 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface User {
   id: string;
-  username: string;
   email: string;
-  role: 'user' | 'admin';
-  createdAt: string;
+  name: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (username: string, email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  checkAuth: () => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
+  logout: () => void;
+  loading: boolean;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
@@ -37,102 +33,99 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
-  const checkAuth = async () => {
-    try {
-      const response = await fetch('/api/auth/me', {
-        credentials: 'include',
-      });
-      
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-      } else {
-        setUser(null);
+  useEffect(() => {
+    // Check if user is logged in (e.g., from localStorage or token)
+    const checkAuth = async () => {
+      try {
+        // Add your authentication check logic here
+        const token = localStorage.getItem('authToken');
+        if (token) {
+          // Verify token and get user data
+          // This is a placeholder - implement your actual auth logic
+          const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+          setUser(userData);
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    checkAuth();
+  }, []);
 
   const login = async (email: string, password: string) => {
-    setLoading(true);
     try {
+      setLoading(true);
+      // Implement your login logic here
+      // This is a placeholder - replace with actual API call
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Login failed');
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('userData', JSON.stringify(data.user));
+      } else {
+        throw new Error('Login failed');
       }
-
-      const userData = await response.json();
-      setUser(userData);
-      router.push('/dashboard');
     } catch (error) {
-      setLoading(false);
+      console.error('Login error:', error);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const register = async (username: string, email: string, password: string) => {
-    setLoading(true);
+  const register = async (name: string, email: string, password: string) => {
     try {
+      setLoading(true);
+      // Implement your registration logic here
+      // This is a placeholder - replace with actual API call
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ name, email, password }),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Registration failed');
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('userData', JSON.stringify(data.user));
+      } else {
+        throw new Error('Registration failed');
       }
-
-      // Auto-login after successful registration
-      await login(email, password);
     } catch (error) {
-      setLoading(false);
+      console.error('Registration error:', error);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const logout = async () => {
-    try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
-      setUser(null);
-      router.push('/login');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');
   };
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
 
   const value = {
     user,
-    loading,
     login,
     register,
     logout,
-    checkAuth,
+    loading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

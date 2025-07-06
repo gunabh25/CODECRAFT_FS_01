@@ -1,103 +1,127 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-
-interface Field {
-  name: string;
-  type: string;
-  placeholder: string;
-  icon?: React.ReactNode;
-  required?: boolean;
-}
+import { ReactNode, useState } from 'react';
+import { motion } from 'framer-motion';
 
 interface AnimatedFormProps {
-  title?: string;
-  fields?: Field[];
+  children: ReactNode;
+  onSubmit: (e: React.FormEvent) => void;
   className?: string;
-  onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void | Promise<void>;
-  submitText?: string;
-  isLoading?: boolean;
-  error?: string;
-  children?: React.ReactNode;
 }
 
-const AnimatedForm: React.FC<AnimatedFormProps> = ({
-  title,
-  fields = [],
-  className = '',
-  onSubmit,
-  submitText = 'Submit',
-  isLoading = false,
-  error = '',
-  children
-}) => {
-  const [formData, setFormData] = useState<Record<string, string>>({});
-  const [isVisible, setIsVisible] = useState(false);
+export const AnimatedForm = ({ children, onSubmit, className = '' }: AnimatedFormProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSubmit) {
-      onSubmit(e);
+    setIsSubmitting(true);
+    try {
+      await onSubmit(e);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.form
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-          className={`space-y-6 max-w-md mx-auto p-6 bg-white shadow-md rounded-md ${className}`}
-          onSubmit={handleSubmit}
+    <motion.form
+      onSubmit={handleSubmit}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className={`space-y-6 ${className}`}
+    >
+      {children}
+      {isSubmitting && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex justify-center"
         >
-          {title && (
-            <h2 className="text-2xl font-bold text-center text-gray-700">
-              {title}
-            </h2>
-          )}
-
-          {fields.map((field) => (
-            <div key={field.name} className="flex items-center border rounded px-3 py-2 space-x-2">
-              {field.icon}
-              <input
-                type={field.type}
-                name={field.name}
-                placeholder={field.placeholder}
-                required={field.required}
-                onChange={handleChange}
-                className="w-full outline-none"
-              />
-            </div>
-          ))}
-
-          {children}
-
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-all disabled:opacity-50"
-          >
-            {isLoading ? 'Loading...' : submitText}
-          </button>
-        </motion.form>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        </motion.div>
       )}
-    </AnimatePresence>
+    </motion.form>
+  );
+};
+
+interface AnimatedInputProps {
+  type: string;
+  placeholder: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
+  className?: string;
+}
+
+export const AnimatedInput = ({ 
+  type, 
+  placeholder, 
+  value, 
+  onChange, 
+  required = false, 
+  className = '' 
+}: AnimatedInputProps) => {
+  const [isFocused, setIsFocused] = useState(false);
+
+  return (
+    <motion.div
+      className="relative"
+      whileFocus={{ scale: 1.02 }}
+      transition={{ duration: 0.2 }}
+    >
+      <input
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        required={required}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+          isFocused ? 'border-blue-500 shadow-md' : 'border-gray-300'
+        } ${className}`}
+      />
+      {isFocused && (
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: '100%' }}
+          className="absolute bottom-0 left-0 h-0.5 bg-blue-500"
+        />
+      )}
+    </motion.div>
+  );
+};
+
+interface AnimatedButtonProps {
+  type?: 'button' | 'submit' | 'reset';
+  children: ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+  className?: string;
+}
+
+export const AnimatedButton = ({ 
+  type = 'submit', 
+  children, 
+  onClick, 
+  disabled = false, 
+  className = '' 
+}: AnimatedButtonProps) => {
+  return (
+    <motion.button
+      type={type}
+      onClick={onClick}
+      disabled={disabled}
+      whileHover={{ scale: disabled ? 1 : 1.05 }}
+      whileTap={{ scale: disabled ? 1 : 0.95 }}
+      className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+        disabled 
+          ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+          : 'bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700'
+      } ${className}`}
+    >
+      {children}
+    </motion.button>
   );
 };
 
