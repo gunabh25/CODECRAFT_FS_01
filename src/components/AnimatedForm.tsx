@@ -1,24 +1,24 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface AnimatedFormProps {
-  children: React.ReactNode
-  className?: string
-  onSubmit?: (e: React.FormEvent) => void
+  children: React.ReactNode;
+  className?: string;
+  onSubmit?: (e: React.FormEvent) => void;
 }
 
-export const AnimatedForm: React.FC<AnimatedFormProps> = ({ 
-  children, 
-  className = '', 
-  onSubmit 
+const AnimatedForm: React.FC<AnimatedFormProps> = ({
+  children,
+  className = '',
+  onSubmit,
 }) => {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    setIsVisible(true)
-  }, [])
+    setIsVisible(true);
+  }, []);
 
   return (
     <AnimatePresence>
@@ -35,7 +35,7 @@ export const AnimatedForm: React.FC<AnimatedFormProps> = ({
         </motion.form>
       )}
     </AnimatePresence>
-  )
-}
+  );
+};
 
-export default AnimatedForm
+export default AnimatedForm;

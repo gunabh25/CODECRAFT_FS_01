@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import AnimatedForm from '@/components/ui/AnimatedForm';
+import AnimatedForm from '@/components/AnimatedForm';
 import { User, Mail, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
