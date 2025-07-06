@@ -13,9 +13,9 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": ".",                      // ✅ ADD THIS
+    "baseUrl": "src",                     
     "paths": {
-      "@/*": ["src/*"]                   // ✅ ADD THIS
+      "@lib/*": ["lib/*"]                   
     },
     "plugins": [{ "name": "next" }]
   },

@@ -5,7 +5,7 @@ declare global {
   var mongoose: { conn: mongoose.Connection | null; promise: Promise<mongoose.Connection> | null } | undefined;
 }
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/nextjs-auth';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://gunabhsharan25:<Gunabh@25>@cluster0.beyrrqi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable');
