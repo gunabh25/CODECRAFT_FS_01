@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import AnimatedForm from '@/components/AnimatedForm'; 
 import { Mail, Lock } from 'lucide-react';
@@ -12,23 +12,36 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
 
-  const handleSubmit = async (e: FormEvent<Element>) => {
-    e.preventDefault();
+  const handleSubmit = async (data: Record<string, string>) => {
     setIsLoading(true);
     setError('');
-    
+
     try {
-      // Extract form data
-      const formData = new FormData(e.target as HTMLFormElement);
-      const data = Object.fromEntries(formData.entries()) as Record<string, string>;
-      
       await login(data.email, data.password);
+      // Optionally redirect here after login
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setIsLoading(false);
     }
   };
+
+  const fields = [
+    {
+      name: 'email',
+      type: 'email',
+      placeholder: 'Enter your email',
+      icon: <Mail size={20} />,
+      required: true,
+    },
+    {
+      name: 'password',
+      type: 'password',
+      placeholder: 'Enter your password',
+      icon: <Lock size={20} />,
+      required: true,
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -42,34 +55,11 @@ export default function LoginPage() {
       
       <AnimatedForm
         onSubmit={handleSubmit}
+        fields={fields}
         submitText="Sign In"
         isLoading={isLoading}
         error={error}
       >
-        <div className="space-y-4">
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="email"
-              name="email"
-              placeholder="Enter your email"
-              required
-              className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400"
-            />
-          </div>
-          
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="password"
-              name="password"
-              placeholder="Enter your password"
-              required
-              className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400"
-            />
-          </div>
-        </div>
-        
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
