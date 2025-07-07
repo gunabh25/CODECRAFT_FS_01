@@ -6,11 +6,13 @@ import AnimatedForm from '@/components/AnimatedForm';
 import { Mail, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation'; // ✅ import router
 
 export default function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const router = useRouter(); // ✅ initialize router
 
   const handleSubmit = async (data: Record<string, string>) => {
     setIsLoading(true);
@@ -18,7 +20,7 @@ export default function LoginPage() {
 
     try {
       await login(data.email, data.password);
-      // Optionally redirect here after login
+      router.push('/dashboard'); // ✅ redirect on success
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {

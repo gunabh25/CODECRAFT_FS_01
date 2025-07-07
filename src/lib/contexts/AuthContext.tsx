@@ -1,4 +1,4 @@
-// src/lib/contexts/AuthContext.tsx
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import {
@@ -8,6 +8,7 @@ import {
   useEffect,
   ReactNode,
 } from 'react';
+import { jwtDecode } from 'jwt-decode';
 
 interface User {
   id: string;
@@ -15,7 +16,7 @@ interface User {
   name: string;
   username: string;
   role: 'admin' | 'user';
-  createdAt: string; // or Date if you prefer
+  createdAt: string;
 }
 
 interface AuthContextType {
@@ -37,60 +38,52 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const token = localStorage.getItem('authToken');
-        if (token) {
-          const userData = localStorage.getItem('userData');
-          if (userData) {
-            setUser(JSON.parse(userData));
-          }
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    const token = document.cookie
+      .split('; ')
+      .find((c) => c.startsWith('auth-token='))
+      ?.split('=')[1];
 
-    checkAuth();
+    if (token) {
+      try {
+        const decoded = jwtDecode<User & { exp: number }>(token);
+        if (decoded.exp * 1000 < Date.now()) {
+          setUser(null); // token expired
+        } else {
+          setUser(decoded);
+        }
+      } catch (err) {
+        console.error('Invalid token');
+        setUser(null);
+      }
+    }
+
+    setLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+    setLoading(true);
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
-      if (!response.ok) throw new Error('Login failed');
-      const data = await response.json();
-      setUser(data.user);
-      localStorage.setItem('authToken', data.token);
-      localStorage.setItem('userData', JSON.stringify(data.user));
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
+    if (!res.ok) throw new Error('Login failed');
+
+    const data = await res.json();
+    setUser(data.user);
+    setLoading(false);
   };
 
   const register = async (
@@ -99,31 +92,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     password: string,
     confirmPassword: string
   ) => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, confirmPassword }),
-      });
+    setLoading(true);
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password, confirmPassword }),
+    });
 
-      if (!response.ok) throw new Error('Registration failed');
-      const data = await response.json();
-      setUser(data.user);
-      localStorage.setItem('authToken', data.token);
-      localStorage.setItem('userData', JSON.stringify(data.user));
-    } catch (error) {
-      console.error('Registration error:', error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
+    if (!res.ok) throw new Error('Registration failed');
+
+    const data = await res.json();
+    setUser(data.user);
+    setLoading(false);
   };
 
   const logout = () => {
+    document.cookie =
+      'auth-token=; path=/; max-age=0; secure; HttpOnly; SameSite=Strict';
     setUser(null);
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
+    window.location.href = '/login';
   };
 
   return (

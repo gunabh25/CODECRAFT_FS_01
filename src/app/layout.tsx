@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { ClientProviders } from './ClientProviders'; 
+import { AuthProvider } from '@/lib/contexts/AuthContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -12,13 +12,11 @@ export const metadata: Metadata = {
   authors: [{ name: 'SecureAuth Team' }],
 };
 
-// ✅ Move viewport out of metadata
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
 };
 
-// ✅ Move themeColor out of metadata
 export const themeColor = '#000000';
 
 export default function RootLayout({
@@ -29,10 +27,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ClientProviders>
-          {children}
-        </ClientProviders>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
 }
+// This layout wraps the entire application, providing global context and styles.
+// It includes metadata for SEO and viewport settings for responsive design.
+// The AuthProvider context is used to manage user authentication state across the app.
