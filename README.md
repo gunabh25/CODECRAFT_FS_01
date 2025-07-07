@@ -33,37 +33,6 @@ A full-stack user authentication system built with **Next.js 14**, **TypeScript*
 
 ---
 
-## 🗂️ Project Structure
-
-src/
-├── app/
-│ ├── (auth)/
-│ │ ├── login/
-│ │ │ └── page.tsx
-│ │ ├── register/
-│ │ │ └── page.tsx
-│ │ └── layout.tsx
-│ ├── dashboard/ // Protected route
-│ │ └── page.tsx
-│ └── layout.tsx
-├── components/
-│ └── AnimatedForm.tsx // Animated reusable form component
-├── lib/
-│ ├── contexts/
-│ │ └── AuthContext.tsx // Authentication context provider
-│ ├── providers/
-│ │ └── index.tsx // Global providers
-│ └── validations/ // (Optional) Zod/Yup schemas
-├── app/api/auth/
-│ ├── login/route.ts // Login handler
-│ └── register/route.ts // Register handler
-
-yaml
-Copy
-Edit
-
----
-
 ## 🔐 Authentication Logic
 
 - **Login/Register**: Users submit credentials via a form.
