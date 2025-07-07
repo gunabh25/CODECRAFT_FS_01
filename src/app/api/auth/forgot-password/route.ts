@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import jwt from 'jsonwebtoken';
 import connectDB from '@/lib/db';
 import User from '@/lib/models/User';
-import { createResetToken } from '../reset-password/route';
+import { sendResetEmail } from '@/lib/email/sendResetEmail';
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
@@ -11,11 +12,15 @@ export async function POST(req: NextRequest) {
   const user = await User.findOne({ email });
   if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-  const token = createResetToken(email);
-  const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token=${token}`;
+  const token = jwt.sign(
+    { userId: user._id, email: user.email },
+    process.env.RESET_PASSWORD_SECRET!,
+    { expiresIn: '15m' }
+  );
 
-  // ✅ Simulate sending email (print to console)
-  console.log(`📧 Reset link for ${email}: ${resetUrl}`);
+  const resetLink = `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token=${token}`;
 
-  return NextResponse.json({ message: 'Reset link sent (check console)' });
+  await sendResetEmail(user.email, resetLink);
+
+  return NextResponse.json({ message: 'Reset link sent to email' });
 }
