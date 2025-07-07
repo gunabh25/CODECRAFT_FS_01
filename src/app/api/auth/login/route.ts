@@ -1,40 +1,37 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// src/app/api/auth/login/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { loginSchema } from '@/lib/validations/auth';
 import { generateToken } from '@/lib/auth';
 import User from '@/lib/models/User';
 import connectDB from '@/lib/db';
+import { ZodError } from 'zod';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log('Login body:', body); // ✅ See what data is sent
 
-    // ✅ Validate request body
     const validatedData = loginSchema.parse(body);
 
-    // ✅ Connect to MongoDB
     await connectDB();
 
-    // ✅ Find user and include password field explicitly
     const user = await User.findOne({ email: validatedData.email }).select('+password');
     if (!user) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
-    // ✅ Compare hashed password
     const isMatch = await user.comparePassword(validatedData.password);
     if (!isMatch) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
-    // ✅ Generate JWT token
     const token = generateToken({
       userId: user._id.toString(),
       email: user.email,
       role: user.role,
     });
 
-    // ✅ Construct secure response
     const response = NextResponse.json(
       {
         message: 'Login successful',
@@ -51,7 +48,6 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
 
-    // ✅ Set secure auth token in cookie
     response.cookies.set({
       name: 'auth-token',
       value: token,
@@ -65,12 +61,22 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     console.error('Login error:', error);
+
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: error.errors },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
-      {
-        error: 'Invalid input or internal error',
-        details: (error as any)?.errors || [],
-      },
+      { error: error instanceof Error ? error.message : 'Internal error' },
       { status: 400 }
     );
   }
 }
+// This code handles the login route for a Next.js application.
+// It validates the incoming request data using a Zod schema, connects to the database,
+// checks the user's credentials, generates a JWT token, and sets it as an HTTP-only cookie.
+// If validation fails, it returns a 400 error with details. If the user is not found or the password is incorrect,
+// it returns a 401 error. On successful login, it returns a 200 response with user details and the token.
