@@ -1,25 +1,32 @@
 /* eslint-disable no-var */
-// src/lib/db.ts
-import mongoose from 'mongoose';
 
-const MONGODB_URI = 'mongodb+srv://gunabhsharan25:<Gunabh@25>@cluster0.beyrrqi.mongodb.net/SecureAuth?retryWrites=true&w=majority&appName=Cluster0';
+import mongoose, { Mongoose } from 'mongoose';
+
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+  throw new Error('❌ Please define the MONGODB_URI environment variable in .env.local');
 }
 
-/**
- * Global is used here to maintain a cached connection across hot reloads
- * in development. This prevents connections growing exponentially
- * during API Route usage.
- */
-let cached = global.mongoose;
-
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+// Global cache interface
+interface MongooseGlobalCache {
+  conn: Mongoose | null;
+  promise: Promise<Mongoose> | null;
 }
 
-async function connectDB() {
+declare global {
+  // Avoid duplicate declaration errors
+  // eslint-disable-next-line no-var
+  var mongooseGlobal: MongooseGlobalCache | undefined;
+}
+
+// ✅ Always initialize (inline), so TS knows it's defined
+const cached: MongooseGlobalCache = global.mongooseGlobal ??= {
+  conn: null,
+  promise: null,
+};
+
+async function connectDB(): Promise<Mongoose> {
   if (cached.conn) {
     return cached.conn;
   }
@@ -29,29 +36,21 @@ async function connectDB() {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
-    });
+    console.log('📡 Connecting to MongoDB with URI:', MONGODB_URI);
+
+    cached.promise = mongoose.connect(MONGODB_URI!, opts);
   }
 
   try {
     cached.conn = await cached.promise;
-  } catch (e) {
+    console.log('✅ MongoDB connected successfully');
+  } catch (err) {
     cached.promise = null;
-    throw e;
+    console.error('❌ MongoDB connection failed:', err);
+    throw err;
   }
 
   return cached.conn;
 }
 
 export default connectDB;
-
-// Type declaration for global mongoose cache
-declare global {
-  var mongoose: {
-    conn: mongoose.Mongoose | null;
-    promise: Promise<mongoose.Mongoose> | null;
-  };
-}
-
-

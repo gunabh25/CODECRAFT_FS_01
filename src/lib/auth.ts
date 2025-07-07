@@ -5,7 +5,7 @@ import { NextRequest } from 'next/server';
 import User from './models/User';
 import connectDB from './db';
 
-const JWT_SECRET = '90e8d3c8550a6c911cf25022b235b9b8ad5e923c798e7f43c6fc71b93767b3dbda823fdb174b75106a8976627f455c37c8cc9d921f313282eef96e19c9eb6c93';
+const JWT_SECRET = 'process.env.JWT_SECRET';
 
 export interface TokenPayload {
   userId: string;
