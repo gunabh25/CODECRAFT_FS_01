@@ -1,36 +1,156 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🔐 Secure User Authentication System
 
-## Getting Started
+A full-stack user authentication system built with **Next.js 14**, **TypeScript**, and **Context API**. Users can **register**, **log in**, and access **protected routes** securely. The app includes support for **password hashing**, **session persistence (via localStorage)**, and **role-based access control** (admin/user).
 
-First, run the development server:
+---
 
-```bash
+## 🚀 Features
+
+- ✅ Register and login with form validation
+- ✅ Protected routes (access control using user authentication)
+- ✅ User session persists using `localStorage`
+- ✅ Global auth state with `React Context`
+- ✅ Passwords hashed (on the backend, assumed using bcrypt)
+- ✅ Role-based access (admin/user)
+- ✅ Client-side form animations (with Framer Motion)
+- ✅ Clean project structure and modular codebase
+
+---
+
+## 🧩 Tech Stack
+
+| Layer        | Technology               |
+|--------------|---------------------------|
+| Frontend     | Next.js 14 + App Router  |
+| Styling      | Tailwind CSS             |
+| Animation    | Framer Motion            |
+| Icons        | Lucide React             |
+| Auth State   | React Context API        |
+| Type Safety  | TypeScript               |
+| Form Validation | (Optional) Zod / Yup |
+| Backend API  | Next.js Route Handlers (API routes) |
+| Persistence  | LocalStorage (client-side) |
+
+---
+
+## 🗂️ Project Structure
+
+src/
+├── app/
+│ ├── (auth)/
+│ │ ├── login/
+│ │ │ └── page.tsx
+│ │ ├── register/
+│ │ │ └── page.tsx
+│ │ └── layout.tsx
+│ ├── dashboard/ // Protected route
+│ │ └── page.tsx
+│ └── layout.tsx
+├── components/
+│ └── AnimatedForm.tsx // Animated reusable form component
+├── lib/
+│ ├── contexts/
+│ │ └── AuthContext.tsx // Authentication context provider
+│ ├── providers/
+│ │ └── index.tsx // Global providers
+│ └── validations/ // (Optional) Zod/Yup schemas
+├── app/api/auth/
+│ ├── login/route.ts // Login handler
+│ └── register/route.ts // Register handler
+
+yaml
+Copy
+Edit
+
+---
+
+## 🔐 Authentication Logic
+
+- **Login/Register**: Users submit credentials via a form.
+- **API Routes**: `/api/auth/login` and `/api/auth/register` handle authentication logic.
+- **Token/UserData**: Stored in `localStorage` after login/register.
+- **AuthContext**: Provides global access to `user`, `login()`, `logout()`, `register()` methods.
+- **Protected Routes**: Components like `Dashboard` check for `user` in `AuthContext`.
+
+---
+
+## 🛡️ Role-Based Access Control
+
+User roles are defined as `admin` or `user`:
+
+```ts
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  username: string;
+  role: 'admin' | 'user';
+  createdAt: string;
+}
+In protected routes, you can restrict content based on role:
+
+tsx
+Copy
+Edit
+if (user?.role !== 'admin') {
+  return <p>Access Denied</p>;
+}
+🧪 Getting Started
+1. Clone the Repo
+bash
+Copy
+Edit
+git clone https://github.com/your-username/secure-auth-system.git
+cd secure-auth-system
+2. Install Dependencies
+bash
+Copy
+Edit
+npm install
+3. Run the App
+bash
+Copy
+Edit
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+App will be live at http://localhost:3000
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🔧 Environment Setup
+You can simulate a .env file if you're using backend DB/auth integration.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+bash
+Copy
+Edit
+# Example .env
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api
+🔐 Future Enhancements
+🔄 JWT-based backend validation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+💾 Use cookies/session storage instead of localStorage
 
-## Learn More
+🧾 Backend with MongoDB/PostgreSQL + Prisma
 
-To learn more about Next.js, take a look at the following resources:
+📦 Deploy to Vercel or Render
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+🧪 Add unit/integration tests
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+👨‍💻 Author
+Gunabh Sharan
+💼 Full-stack Developer | MERN | Next.js | TypeScript
+🔗 LinkedIn - Gunabh Sharan
+📧 gunabhsharan.25@gmail.com
 
-## Deploy on Vercel
+📄 License
+This project is licensed under the MIT License.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+yaml
+Copy
+Edit
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+Let me know if you'd like:
+- MongoDB/Prisma integration guide
+- Backend README version
+- Badge integrations (Vercel Deploy, Code Coverage, etc.)
+
+Would you also like me to generate a `package.json` or add markdown badges?
