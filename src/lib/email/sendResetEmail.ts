@@ -5,7 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY!);
 export async function sendResetEmail(email: string, resetLink: string) {
   try {
     const data = await resend.emails.send({
-      from: 'Gunabh<no-reply@gmail.com>',
+      from: 'SecureAuth <no-reply@gunabhsharan.com>',
       to: email,
       subject: 'Reset Your Password',
       html: `
