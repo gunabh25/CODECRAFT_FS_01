@@ -33,9 +33,9 @@ export async function POST(request: NextRequest) {
           id: user._id.toString(),
           name: user.name,
           email: user.email,
-          username: user.username,       // ✅ Added
-          role: user.role,               // ✅ Already present
-          createdAt: user.createdAt,     // ✅ Added
+          username: user.username,        
+          role: user.role,               
+          createdAt: user.createdAt,      
         },
         token,
       },
