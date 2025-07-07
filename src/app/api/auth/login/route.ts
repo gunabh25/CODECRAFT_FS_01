@@ -9,23 +9,32 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Validate request body
+    // ✅ Validate request body
     const validatedData = loginSchema.parse(body);
 
+    // ✅ Connect to MongoDB
     await connectDB();
 
-    // Check user credentials
-    const user = await User.findOne({ email: validatedData.email });
-    if (!user || !(await user.comparePassword(validatedData.password))) {
+    // ✅ Find user and include password field explicitly
+    const user = await User.findOne({ email: validatedData.email }).select('+password');
+    if (!user) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
+    // ✅ Compare hashed password
+    const isMatch = await user.comparePassword(validatedData.password);
+    if (!isMatch) {
+      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
+    }
+
+    // ✅ Generate JWT token
     const token = generateToken({
       userId: user._id.toString(),
       email: user.email,
       role: user.role,
     });
 
+    // ✅ Construct secure response
     const response = NextResponse.json(
       {
         message: 'Login successful',
@@ -33,22 +42,23 @@ export async function POST(request: NextRequest) {
           id: user._id.toString(),
           name: user.name,
           email: user.email,
-          username: user.username,        
-          role: user.role,               
-          createdAt: user.createdAt,      
+          username: user.username,
+          role: user.role,
+          createdAt: user.createdAt,
         },
         token,
       },
       { status: 200 }
     );
 
+    // ✅ Set secure auth token in cookie
     response.cookies.set({
       name: 'auth-token',
       value: token,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: 60 * 60 * 24 * 7, // 7 days
       path: '/',
     });
 
@@ -56,7 +66,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(
-      { error: 'Invalid input or internal error', details: (error as any)?.errors || [] },
+      {
+        error: 'Invalid input or internal error',
+        details: (error as any)?.errors || [],
+      },
       { status: 400 }
     );
   }
